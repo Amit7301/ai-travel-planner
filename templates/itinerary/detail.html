@@ -26,7 +26,7 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="itinerary-content">
-                        {{ itinerary.generated_itinerary|linebreaks }}
+                        <div id="formatted-itinerary">{{ itinerary.generated_itinerary|linebreaks }}</div>
                     </div>
                     <hr>
                     <div class="text-muted">
@@ -60,5 +60,124 @@
     .navbar, .card-footer, .btn { display: none !important; }
     .card { border: none !important; box-shadow: none !important; }
 }
+
+/* Format the itinerary content */
+#formatted-itinerary {
+    line-height: 1.6;
+    color: #333;
+}
+
+#formatted-itinerary h1, 
+#formatted-itinerary h2, 
+#formatted-itinerary h3, 
+#formatted-itinerary h4 {
+    color: #2c3e50;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+#formatted-itinerary h1 { font-size: 1.8em; }
+#formatted-itinerary h2 { font-size: 1.5em; }
+#formatted-itinerary h3 { font-size: 1.3em; }
+#formatted-itinerary h4 { font-size: 1.1em; }
+
+#formatted-itinerary ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+#formatted-itinerary li {
+    margin-bottom: 5px;
+}
+
+#formatted-itinerary strong {
+    color: #34495e;
+    font-weight: 600;
+}
+
+#formatted-itinerary .day-section {
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+#formatted-itinerary .cost-section {
+    background-color: #e8f5e8;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+#formatted-itinerary .tip-section {
+    background-color: #fff3cd;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border-left: 3px solid #ffc107;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const itineraryContent = document.getElementById('formatted-itinerary');
+    if (itineraryContent) {
+        let content = itineraryContent.innerHTML;
+        
+        // Remove excessive dashes
+        content = content.replace(/^---+$/gm, '<hr class="my-3">');
+        content = content.replace(/^-{3,}/gm, '<hr class="my-3">');
+        
+        // Convert **text** to <strong>text</strong>
+        content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Convert ### Headers to h3
+        content = content.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+        
+        // Convert ## Headers to h2
+        content = content.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+        
+        // Convert # Headers to h1
+        content = content.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+        
+        // Convert bullet points - **text:** to styled list items
+        content = content.replace(/^- \*\*(.*?)\*\*:\s*(.*$)/gm, '<li><strong>$1:</strong> $2</li>');
+        content = content.replace(/^- \*\*(.*?)\*\*\s*(.*$)/gm, '<li><strong>$1</strong> $2</li>');
+        
+        // Convert regular bullet points
+        content = content.replace(/^- (.*$)/gm, '<li>$1</li>');
+        
+        // Wrap consecutive <li> elements in <ul>
+        content = content.replace(/(<li>.*?<\/li>)(?:\s*<li>.*?<\/li>)*/g, function(match) {
+            return '<ul>' + match + '</ul>';
+        });
+        
+        // Style specific sections
+        content = content.replace(/<h3>Day \d+:.*?<\/h3>/g, function(match) {
+            return '<div class="day-section">' + match;
+        });
+        
+        content = content.replace(/(<h3>Day \d+:.*?<\/h3>)(.*?)(?=<h3>|$)/gs, function(match, header, body) {
+            return '<div class="day-section">' + header + body + '</div>';
+        });
+        
+        // Style cost sections
+        content = content.replace(/(Estimated Costs?:|Total:)(.*?)(?=<h|$)/gs, function(match) {
+            return '<div class="cost-section">' + match + '</div>';
+        });
+        
+        // Style tip sections
+        content = content.replace(/(Travel Tips?:|Travel Tip:)(.*?)(?=<h|$)/gs, function(match) {
+            return '<div class="tip-section"><i class="fas fa-lightbulb me-2"></i>' + match + '</div>';
+        });
+        
+        // Clean up multiple line breaks
+        content = content.replace(/(<br\s*\/?>){3,}/g, '<br><br>');
+        
+        itineraryContent.innerHTML = content;
+    }
+});
+</script>
 {% endblock %}

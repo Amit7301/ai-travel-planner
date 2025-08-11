@@ -32,16 +32,13 @@ class Command(BaseCommand):
                 return
             
             # Test API connection
-            # url = f"{settings.AZURE_OPENAI_ENDPOINT}/openai/deployments/{settings.AZURE_OPENAI_DEPLOYMENT_NAME}/chat/completions?api-version={getattr(settings, 'AZURE_OPENAI_API_VERSION', '2024-02-01')}"
+            url = f"{settings.AZURE_OPENAI_ENDPOINT}/openai/deployments/{settings.AZURE_OPENAI_DEPLOYMENT_NAME}/chat/completions?api-version={getattr(settings, 'AZURE_OPENAI_API_VERSION', '2024-02-01')}"
             
-            # headers = {
-            #     "Content-Type": "application/json",
-            #     "api-key": settings.AZURE_OPENAI_API_KEY
-            # }
-            url =get_azure_openai_url()
-        
-            headers = get_azure_openai_headers()
-            print(url, headers)
+            headers = {
+                "Content-Type": "application/json",
+                "api-key": settings.AZURE_OPENAI_API_KEY
+            }
+
             
             data = {
                 "messages": [

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Travel Itinerary Generator{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Plan Your Perfect Trip</h1>
+        <p class="lead mb-5">Generate personalized travel itineraries powered by AI</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-4">Create Your Itinerary</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.source.id_for_label }}" class="form-label">
+                                    <i class="fas fa-plane-departure me-2"></i>From
+                                </label>
+                                {{ form.source }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.destination.id_for_label }}" class="form-label">
+                                    <i class="fas fa-plane-arrival me-2"></i>To
+                                </label>
+                                {{ form.destination }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.days.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-days me-2"></i>Days
+                                </label>
+                                {{ form.days }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.budget.id_for_label }}" class="form-label">
+                                    <i class="fas fa-wallet me-2"></i>Budget
+                                </label>
+                                {{ form.budget }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.travel_style.id_for_label }}" class="form-label">
+                                    <i class="fas fa-compass me-2"></i>Style
+                                </label>
+                                {{ form.travel_style }}
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic me-2"></i>Generate Itinerary
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if recent_itineraries %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4 text-white">Recent Itineraries</h3>
+            <div class="row">
+                {% for itinerary in recent_itineraries %}
+                <div class="col-md-4 mb-4">
+                    <div class="card itinerary-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-route me-2"></i>
+                                {{ itinerary.source }} → {{ itinerary.destination }}
+                            </h5>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>{{ itinerary.days }} days
+                                    <i class="fas fa-tag ms-2 me-1"></i>{{ itinerary.get_budget_display }}
+                                </small>
+                            </p>
+                            <a href="{% url 'itinerary_detail' itinerary.pk %}" class="btn btn-outline-primary btn-sm">
+                                View Itinerary
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
